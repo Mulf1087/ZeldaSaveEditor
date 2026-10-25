@@ -1,0 +1,6 @@
+.table {
+  composes: table from "../../theme/controls.module.css";
+}
+.input {
+  composes: input from "../../theme/controls.module.css";
+}

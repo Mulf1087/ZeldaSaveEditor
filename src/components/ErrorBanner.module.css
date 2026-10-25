@@ -1,0 +1,12 @@
+.banner {
+  background: var(--danger-bg);
+  border: 1px solid var(--danger);
+  color: var(--text);
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+.dismiss {
+  composes: button from "../theme/controls.module.css";
+  border-color: var(--danger);
+}

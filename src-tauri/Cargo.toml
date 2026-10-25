@@ -1,0 +1,19 @@
+[package]
+name = "zeldasaveeditor"
+version = "1.0.0"
+edition = "2021"
+
+[lib]
+name = "zeldasaveeditor_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+save-engine = { path = "../crates/save-engine" }
+serde = { version = "1", features = ["derive"] }
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+zip = { version = "0.6.6", default-features = false, features = ["deflate"] }

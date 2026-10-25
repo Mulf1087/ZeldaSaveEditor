@@ -1,0 +1,17 @@
+.wrap {
+  margin: 24px 0 8px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.motif {
+  position: relative;
+  top: -2px;
+}
+.title {
+  font-family: var(--font-display);
+  color: var(--text);
+  margin: 0;
+}

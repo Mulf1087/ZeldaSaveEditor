@@ -1,0 +1,10 @@
+.icon {
+  object-fit: contain;
+  display: block;
+}
+.previewImg {
+  width: 144px;
+  height: 144px;
+  object-fit: contain;
+  display: block;
+}

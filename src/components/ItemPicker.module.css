@@ -1,0 +1,106 @@
+.picker {
+  position: relative;
+  display: inline-block;
+}
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 240px;
+  padding: 2px 6px;
+  background: var(--bg-panel);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 0.85rem;
+}
+.triggerIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.triggerLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.caret {
+  margin-left: auto;
+  opacity: 0.6;
+}
+.panel {
+  z-index: 50;
+  width: 300px;
+  max-width: calc(100vw - 16px);
+  background: var(--bg-panel);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+.search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  background: var(--bg);
+  color: var(--text);
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 4px 4px 0 0;
+}
+.results {
+  max-height: 260px;
+  overflow-y: auto;
+}
+.option,
+.optionActive {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.optionActive {
+  background: color-mix(in srgb, var(--accent) 30%, var(--bg-panel));
+}
+.optionIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+.optionLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.empty {
+  padding: 8px;
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+/* Touch devices (Android, tablets) get a bigger panel and taller, easier-to-tap rows. A mouse
+   doesn't need the extra size, so this targets pointer precision rather than viewport width. */
+@media (pointer: coarse) {
+  .panel {
+    width: 340px;
+  }
+  .search {
+    padding: 12px 10px;
+    font-size: 1rem;
+  }
+  .results {
+    max-height: min(420px, 70vh);
+  }
+  .option,
+  .optionActive {
+    padding: 12px 10px;
+    font-size: 1rem;
+  }
+}

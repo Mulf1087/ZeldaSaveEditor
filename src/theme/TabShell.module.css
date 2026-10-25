@@ -1,0 +1,37 @@
+.tabBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+.tab {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--text);
+  opacity: 0.6;
+  cursor: pointer;
+}
+.label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+}
+.tab:hover {
+  opacity: 0.9;
+}
+/* Fill the wavy frame with a faint accent wash on the active tab (via a cascading custom property
+   that WavyFrame's path reads) so it reads as selected without an underline. */
+.active {
+  opacity: 1;
+  --wavy-fill: color-mix(in srgb, var(--accent) 20%, transparent);
+}
+.content {
+  min-height: 200px;
+}

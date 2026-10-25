@@ -1,0 +1,52 @@
+:root {
+  --font-display: "Special Elite", cursive;
+}
+
+[data-game="botw"] {
+  --bg: #1b2420;
+  --text: #ece6d6;
+  --accent: #52c7e0;
+  --accent-secondary: #8fce68;
+  --accent-tertiary: #e2a85c;
+}
+
+[data-game="totk"] {
+  --bg: #211a14;
+  --text: #ecdfc8;
+  --accent: #e0a63f;
+  --accent-secondary: #7fb8a8;
+  --accent-tertiary: #8a67a0;
+}
+
+[data-game="neutral"] {
+  --bg: #201d18;
+  --text: #e8e1d2;
+  --accent: #8a9782;
+  --accent-secondary: var(--accent);
+  --accent-tertiary: var(--accent);
+}
+
+:root {
+  --bg-panel: color-mix(in srgb, var(--bg) 85%, var(--text) 15%);
+  --border: color-mix(in srgb, var(--bg) 65%, var(--text) 35%);
+  --danger: #ff6b5e;
+  --danger-bg: #3a211f;
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  margin: 0;
+}
+
+button,
+select,
+input[type="checkbox"] {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+}

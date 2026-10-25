@@ -1,0 +1,14 @@
+.trigger {
+  display: inline-flex;
+  cursor: zoom-in;
+}
+.preview {
+  position: fixed;
+  z-index: 100;
+  pointer-events: none;
+  padding: 6px;
+  background: var(--bg-panel);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}

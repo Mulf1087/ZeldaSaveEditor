@@ -1,0 +1,14 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.field {
+  composes: field from "../../theme/controls.module.css";
+}
+.input {
+  composes: input from "../../theme/controls.module.css";
+}
+.row {
+  margin-bottom: 4px;
+}

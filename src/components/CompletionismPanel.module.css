@@ -1,0 +1,51 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+.card {
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: rgba(0, 0, 0, 0.15);
+}
+.cardTitle {
+  text-align: center;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.metric {
+  margin-top: 8px;
+}
+.metricLabel {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+.metricValue {
+  font-size: 0.95rem;
+}
+.metricValue small {
+  opacity: 0.6;
+}
+.track {
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  margin: 4px 0;
+}
+.fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.2s ease;
+}
+.fill[data-complete="true"] {
+  background: #4caf7d;
+}
+.setButton {
+  composes: button from "../theme/controls.module.css";
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  margin-top: 2px;
+}
