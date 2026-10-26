@@ -22,11 +22,11 @@ export default function CaptionView({ info }: Props) {
 
   return (
     <div className={styles.view}>
-      <SectionHeading title="Save Thumbnail" motif={<TotkMotif />} />
-      {imageUrl && <img className={styles.thumbnail} src={imageUrl} alt="Save slot thumbnail" />}
+      <SectionHeading title="存档缩略图" motif={<TotkMotif />} />
+      {imageUrl && <img className={styles.thumbnail} src={imageUrl} alt="存档栏位缩略图" />}
       <p className={styles.meta}>
-        {capturedAt.toLocaleString()}
-        {info.is_autosave && <span className={styles.autosave}>Autosave</span>}
+        {capturedAt.toLocaleString("zh-CN")}
+        {info.is_autosave && <span className={styles.autosave}>自动保存</span>}
       </p>
     </div>
   );

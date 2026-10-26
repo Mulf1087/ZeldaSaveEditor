@@ -11,6 +11,10 @@ interface Props {
 
 const MAX_RESULTS = 300;
 const MIN_QUERY_LENGTH = 2;
+const TYPE_LABELS: Record<string, string> = {
+  Bool: "布尔值", Int: "整数", UInt: "无符号整数", Enum: "枚举值",
+  Float: "浮点数", String: "文本", Unknown: "未知类型",
+};
 
 export default function TotkHashBrowser({ onError }: Props) {
   const [rows, setRows] = useState<TotkHashRow[] | null>(null);
@@ -36,15 +40,14 @@ export default function TotkHashBrowser({ onError }: Props) {
 
   return (
     <div className={styles.view}>
-      <SectionHeading title="Advanced: Hash Browser" motif={<TotkMotif />} />
+      <SectionHeading title="高级：哈希字段浏览器" motif={<TotkMotif />} />
       <p className={styles.warning}>
-        Raw save-format access, for editing fields the app doesn't otherwise expose. Edits here
-        skip the app's normal validation and can corrupt your save if the value is wrong.
+        可直接编辑软件未单独列出的存档字段。这里的修改不经过常规校验，输入错误可能损坏存档。
       </p>
       <input
         className={styles.search}
         type="text"
-        placeholder="Search by field name or hex hash..."
+        placeholder="按字段名称或十六进制哈希搜索…"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
@@ -52,18 +55,18 @@ export default function TotkHashBrowser({ onError }: Props) {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Hash</th>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Value</th>
+              <th>哈希值</th>
+              <th>名称</th>
+              <th>类型</th>
+              <th>数值</th>
             </tr>
           </thead>
           <tbody>
             {matches.map((row) => (
               <tr key={row.hash}>
                 <td>{row.hash.toString(16).padStart(8, "0")}</td>
-                <td>{row.name ?? "(unknown)"}</td>
-                <td>{row.type_name}</td>
+                <td>{row.name ?? "（未知）"}</td>
+                <td>{TYPE_LABELS[row.type_name] ?? row.type_name}</td>
                 <td>
                   {row.editable ? (
                     row.type_name === "Bool" ? (
@@ -81,7 +84,7 @@ export default function TotkHashBrowser({ onError }: Props) {
                       />
                     )
                   ) : (
-                    <span className={styles.readonly}>0x{row.value.toString(16)} (read-only)</span>
+                    <span className={styles.readonly}>0x{row.value.toString(16)} （只读）</span>
                   )}
                 </td>
               </tr>
@@ -90,7 +93,7 @@ export default function TotkHashBrowser({ onError }: Props) {
         </table>
       )}
       {matches.length === MAX_RESULTS && (
-        <p className={styles.truncated}>Showing the first {MAX_RESULTS} matches, refine your search for more.</p>
+        <p className={styles.truncated}>仅显示前 {MAX_RESULTS} 条结果，请缩小搜索范围。</p>
       )}
     </div>
   );

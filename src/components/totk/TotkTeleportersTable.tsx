@@ -12,16 +12,16 @@ function textToVec3(raw: string): [number, number, number] {
 }
 
 const columns: ColumnDef<TotkTeleporter>[] = [
-  { key: "index", label: "Index", type: "number", parse: (raw) => Number(raw) as TotkTeleporter["index"] },
+  { key: "index", label: "序号", type: "number", parse: (raw) => Number(raw) as TotkTeleporter["index"] },
   {
     key: "pos",
-    label: "Position (x,y,z)",
+    label: "位置 (x,y,z)",
     format: (v) => vec3ToText(v as [number, number, number]),
     parse: (raw) => textToVec3(raw) as TotkTeleporter["pos"],
   },
   {
     key: "rot",
-    label: "Rotation (x,y,z)",
+    label: "旋转 (x,y,z)",
     format: (v) => vec3ToText(v as [number, number, number]),
     parse: (raw) => textToVec3(raw) as TotkTeleporter["rot"],
   },
@@ -35,7 +35,7 @@ interface Props {
 export default function TotkTeleportersTable({ teleporters, onError }: Props) {
   return (
     <EditableEntryTable
-      title="Teleporters"
+      title="传送点"
       entries={teleporters}
       columns={columns}
       setter={api.setTeleporters}

@@ -70,7 +70,7 @@ export interface StringOption {
 }
 
 function toOptions(ids: string[]): StringOption[] {
-  return ids.map((id) => ({ value: id, label: BOTW_ITEM_NAMES[id] ?? id }));
+  return ids.map((id) => ({ value: id, label: BOTW_ITEM_NAMES[id] ?? `马匹 ${id.replace("GameRomHorse", "") || "普通"}` }));
 }
 
 export const HORSE_TYPE_OPTIONS = toOptions(HORSE_TYPE_IDS);

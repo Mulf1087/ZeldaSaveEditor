@@ -24,26 +24,26 @@ function num(key: keyof TotkHorse, label: string): ColumnDef<TotkHorse> {
 const columns: ColumnDef<TotkHorse>[] = [
   {
     key: "id",
-    label: "Id",
+    label: "物品 ID",
     type: "itempicker",
     // Horses have no per-id icon (marcrobledo draws them procedurally from color data), so the
     // picker shows just name + id.
     picker: { items: HORSE_AVAILABILITY, renderIcon: () => null, nameFor: (id) => TOTK_ITEM_NAMES[id] },
   },
-  { key: "name", label: "Name", type: "text" },
-  { key: "mane", label: "Mane", type: "select", options: MANE_OPTIONS },
-  { key: "saddle", label: "Saddle", type: "select", options: SADDLE_OPTIONS },
-  { key: "rein", label: "Rein", type: "select", options: REIN_OPTIONS },
-  num("bond", "Bond (0-100)"),
-  { key: "bond_checked", label: "Bond Checked", type: "checkbox" },
-  num("stats_strength", "Strength (100-350)"),
-  { key: "stats_speed", label: "Speed", type: "select", options: STAT_STAR_OPTIONS },
-  { key: "stats_stamina", label: "Stamina", type: "select", options: STAMINA_STAR_OPTIONS },
-  { key: "stats_pull", label: "Pull", type: "select", options: STAT_STAR_OPTIONS },
-  num("horse_type", "Type"),
-  num("color_type", "Color"),
-  num("foot_type", "Foot"),
-  num("room_id", "Room Id"),
+  { key: "name", label: "名称", type: "text" },
+  { key: "mane", label: "鬃毛", type: "select", options: MANE_OPTIONS },
+  { key: "saddle", label: "马鞍", type: "select", options: SADDLE_OPTIONS },
+  { key: "rein", label: "缰绳", type: "select", options: REIN_OPTIONS },
+  num("bond", "亲密度 (0-100)"),
+  { key: "bond_checked", label: "已确认亲密度", type: "checkbox" },
+  num("stats_strength", "力量 (100-350)"),
+  { key: "stats_speed", label: "速度", type: "select", options: STAT_STAR_OPTIONS },
+  { key: "stats_stamina", label: "精力", type: "select", options: STAMINA_STAR_OPTIONS },
+  { key: "stats_pull", label: "牵引力", type: "select", options: STAT_STAR_OPTIONS },
+  num("horse_type", "类型"),
+  num("color_type", "颜色"),
+  num("foot_type", "蹄型"),
+  num("room_id", "房间 ID"),
 ];
 
 interface Props {
@@ -54,7 +54,7 @@ interface Props {
 export default function TotkHorsesTable({ horses, onError }: Props) {
   return (
     <EditableEntryTable
-      title="Horses"
+      title="马匹"
       entries={horses}
       columns={columns}
       setter={api.setHorses}

@@ -86,7 +86,7 @@ fn find_archive_saves(games: &Path, saves: &mut Vec<LocatedSave>) {
 }
 
 #[tauri::command]
-pub fn discover_local_saves() -> Result<Vec<LocatedSave>, ShellError> {
+pub async fn discover_local_saves() -> Result<Vec<LocatedSave>, ShellError> {
     let home = home()?;
     let native = home.join("Library/Application Support/MacNativeGames");
     let mut saves = Vec::new();

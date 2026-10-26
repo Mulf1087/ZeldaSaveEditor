@@ -1,0 +1,37 @@
+.inventory { font-family: system-ui, sans-serif; }
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0 13px; }
+.count { color: color-mix(in srgb, var(--text) 69%, transparent); font-size: .82rem; letter-spacing: .02em; }
+.pager { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; font-size: .82rem; }
+.pager button { width: 28px; height: 28px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-panel); color: var(--accent); font-size: 1.3rem; line-height: 1; }
+.pager button:not(:disabled):hover { border-color: var(--accent); }
+.pager button:disabled { opacity: .35; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(122px, 1fr)); gap: 10px; }
+.slot { position: relative; min-width: 0; min-height: 155px; padding: 12px 8px 9px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 4px; color: var(--text); background: linear-gradient(145deg, color-mix(in srgb, var(--bg-panel) 85%, var(--accent) 15%), var(--bg-panel)); border: 1px solid var(--border); border-radius: 5px; text-align: center; box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--bg) 75%, transparent); transition: border-color .15s, transform .15s, background .15s; }
+.slot:hover { border-color: var(--accent); transform: translateY(-2px); }
+.slot[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--bg-panel) 77%, var(--accent) 23%); box-shadow: inset 0 0 0 2px var(--accent), 0 0 16px color-mix(in srgb, var(--accent) 18%, transparent); }
+.slot:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.slotNumber { position: absolute; top: 7px; left: 9px; color: color-mix(in srgb, var(--text) 48%, transparent); font-size: .66rem; font-variant-numeric: tabular-nums; }
+.icon { height: 76px; display: grid; place-items: center; }
+.icon > * { max-width: 68px; max-height: 68px; }
+.badge { position: absolute; right: 7px; top: 58px; padding: 1px 5px; border-radius: 3px; background: color-mix(in srgb, var(--bg) 84%, black); color: var(--text); font-size: .72rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.badge[data-quantity="true"] { top: 7px; }
+.name { max-width: 100%; min-height: 2.4em; font-size: .81rem; font-weight: 650; line-height: 1.2; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; }
+.meta { width: 100%; color: var(--accent); font-size: .69rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.empty { padding: 36px 15px; border: 1px dashed var(--border); border-radius: 5px; text-align: center; color: color-mix(in srgb, var(--text) 65%, transparent); }
+.detail { margin-top: 18px; padding: 15px; border: 1px solid var(--border); border-top: 2px solid var(--accent); border-radius: 5px; background: color-mix(in srgb, var(--bg-panel) 80%, var(--bg)); }
+.detailHeading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 14px; margin-bottom: 12px; }
+.detailEyebrow { color: var(--accent); font-size: .68rem; letter-spacing: .12em; }
+.detailHeading strong { font-size: 1rem; }
+.detailHint { margin-left: auto; font-size: .72rem; opacity: .62; }
+.detailTable, .detailTable tbody { display: block; width: 100%; }
+.detailTable thead, .detailTable td[data-summary] { display: none; }
+.detailTable tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 16px; border: 0; padding: 0; margin: 0; background: none; }
+.detailTable td[data-label] { display: flex !important; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; border: 0; padding: 3px 0; background: none !important; cursor: auto; }
+.detailTable td[data-label]::before { content: attr(data-label); flex: 0 0 auto; font-family: var(--font-display); font-size: .77rem; opacity: .72; }
+.detailTable input, .detailTable select { min-width: 0; max-width: 100%; }
+@media (max-width: 680px) {
+  .grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 7px; }
+  .slot { min-height: 148px; }
+  .detailTable tr { grid-template-columns: 1fr; }
+  .detailHint { margin-left: 0; }
+}

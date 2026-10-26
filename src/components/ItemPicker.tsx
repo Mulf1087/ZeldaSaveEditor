@@ -172,7 +172,7 @@ export default function ItemPicker({ value, items, renderIcon, nameFor, onCommit
             <input
               autoFocus={!isCoarsePointer}
               className={styles.search}
-              placeholder="Search..."
+              placeholder="搜索名称或 ID…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={onKeyDown}
@@ -196,7 +196,7 @@ export default function ItemPicker({ value, items, renderIcon, nameFor, onCommit
                   <span className={styles.optionLabel}>{label(id)}</span>
                 </div>
               ))}
-              {filtered.length === 0 && <div className={styles.empty}>No matches</div>}
+              {filtered.length === 0 && <div className={styles.empty}>没有匹配的物品</div>}
             </div>
           </div>,
           document.body,

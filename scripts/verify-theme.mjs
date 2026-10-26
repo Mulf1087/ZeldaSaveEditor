@@ -1,7 +1,8 @@
 import { chromium } from "playwright";
+import { createServer } from "vite";
 
 const game = process.argv[2] ?? "neutral"; // botw | totk | neutral
-const outPath = process.argv[3] ?? `scratch-${game}.png`;
+const outPath = process.argv[3] ?? `/tmp/zelda-theme-${game}.png`;
 
 const mocks = {
   botw: {
@@ -141,7 +142,9 @@ const mocks = {
   },
 };
 
-const browser = await chromium.launch();
+const server = await createServer({ server: { host: "127.0.0.1", port: 1422, strictPort: true } });
+await server.listen();
+const browser = await chromium.launch({ channel: "chrome" });
 const page = await browser.newPage({ viewport: { width: 1280, height: 1600 } });
 
 await page.addInitScript((mock) => {
@@ -149,6 +152,7 @@ await page.addInitScript((mock) => {
     invoke: async (cmd) => {
       if (cmd === "open_save") return mock;
       if (cmd === "get_botw_state" || cmd === "get_totk_state") return mock?.state ?? null;
+      if (cmd === "discover_local_saves") return [];
       return null;
     },
     transformCallback: (callback) => {
@@ -164,13 +168,14 @@ await page.addInitScript((mock) => {
   window.__TAURI_EVENT_PLUGIN_INTERNALS__ = { unregisterListener: () => {} };
 }, mocks[game] ?? null);
 
-await page.goto("http://localhost:1420");
+await page.goto("http://127.0.0.1:1422");
 
 if (game !== "neutral") {
-  await page.getByText("Open...").click();
+  await page.getByRole("button", { name: "打开 .sav…" }).click();
   await page.waitForTimeout(300);
 }
 
 await page.screenshot({ path: outPath, fullPage: true });
 await browser.close();
+await server.close();
 console.log(`saved ${outPath}`);

@@ -10,6 +10,10 @@ import styles from "./TotkKeyAbilities.module.css";
  * the game tracks per ability; state is fetched once on mount and updated optimistically on click.
  */
 export default function TotkKeyAbilities({ onError }: { onError: (msg: string) => void }) {
+  const abilityNames: Record<string, string> = {
+    UltraHand: "究极手", OneTouchBond: "余料建造", Tooreroof: "通天术",
+    ReverseRecorder: "倒转乾坤", AutoBuilder: "蓝图", AmiiboItem: "amiibo",
+  };
   const [abilities, setAbilities] = useState<TotkAbility[]>([]);
 
   useEffect(() => {
@@ -39,10 +43,10 @@ export default function TotkKeyAbilities({ onError }: { onError: (msg: string) =
           className={`${styles.toggle} ${ability.unlocked ? styles.on : ""}`}
           onClick={() => toggle(ability)}
           aria-pressed={ability.unlocked}
-          title={ability.unlocked ? `${ability.label} (unlocked)` : `${ability.label} (locked)`}
+          title={ability.unlocked ? `${abilityNames[ability.id] ?? ability.label}（已解锁）` : `${abilityNames[ability.id] ?? ability.label}（未解锁）`}
         >
           <img className={styles.icon} src={totkIconUrl("keyItem", `Obj_${ability.id}`)} alt="" />
-          <span className={styles.label}>{ability.label}</span>
+          <span className={styles.label}>{abilityNames[ability.id] ?? ability.label}</span>
         </button>
       ))}
     </div>

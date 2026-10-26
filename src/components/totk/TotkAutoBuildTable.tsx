@@ -15,23 +15,23 @@ function textToVec3(raw: string): [number, number, number] {
 // combined_actor_info is a 6688-byte binary blob per slot, not something to hand-edit
 // as a table cell. Shown read-only as a byte count instead.
 const columns: ColumnDef<TotkAutoBuildEntry>[] = [
-  { key: "index", label: "Index", type: "number", parse: (raw) => Number(raw) as TotkAutoBuildEntry["index"] },
+  { key: "index", label: "序号", type: "number", parse: (raw) => Number(raw) as TotkAutoBuildEntry["index"] },
   {
     key: "camera_pos",
-    label: "Camera Position (x,y,z)",
+    label: "相机位置 (x,y,z)",
     format: (v) => vec3ToText(v as [number, number, number]),
     parse: (raw) => textToVec3(raw) as TotkAutoBuildEntry["camera_pos"],
   },
   {
     key: "camera_at",
-    label: "Camera Target (x,y,z)",
+    label: "相机目标 (x,y,z)",
     format: (v) => vec3ToText(v as [number, number, number]),
     parse: (raw) => textToVec3(raw) as TotkAutoBuildEntry["camera_at"],
   },
-  { key: "is_favorite", label: "Favorite", type: "checkbox" },
+  { key: "is_favorite", label: "收藏", type: "checkbox" },
   {
     key: "combined_actor_info",
-    label: "Blob Size",
+    label: "数据大小",
     type: "readonly",
     format: (v) => `${(v as number[]).length} bytes`,
   },
@@ -45,7 +45,7 @@ interface Props {
 export default function TotkAutoBuildTable({ autobuilds, onError }: Props) {
   return (
     <EditableEntryTable
-      title="AutoBuild Drafts"
+      title="蓝图草稿"
       entries={autobuilds}
       columns={columns}
       setter={api.setAutobuilds}
@@ -53,7 +53,7 @@ export default function TotkAutoBuildTable({ autobuilds, onError }: Props) {
       level="h3"
       motif={<TotkMotif />}
       // No natural name for a draft; surface its favourite state so a collapsed card isn't just "#".
-      nameFor={(e) => (e.is_favorite ? "★ Favourite draft" : "Draft")}
+      nameFor={(e) => (e.is_favorite ? "★ 收藏的蓝图" : "蓝图草稿")}
     />
   );
 }

@@ -7,7 +7,7 @@ import CompletionismPanel from "../CompletionismPanel";
 // the file rather than flipping an existing flag, so they get a heads-up before running.
 const GUID_CONFIRM = new Set(["bubbuls", "sage_wills", "addison"]);
 const GUID_MESSAGE =
-  "This adds entries to your save's internal tracking data and grows the file slightly, a less common kind of edit than others in this tool. Continue?";
+  "这会向存档的内部追踪数据添加记录，使文件略微增大。是否继续？";
 
 interface Props {
   state: { completism: CompletismCategory[] };

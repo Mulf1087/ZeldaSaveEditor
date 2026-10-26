@@ -31,6 +31,20 @@ function nameFor(entry: { id: string }): string | undefined {
   return TOTK_ITEM_NAMES[entry.id];
 }
 
+function modifierName(options: { value: number; label: string }[], modifier: number): string {
+  const label = options.find((option) => option.value === modifier)?.label;
+  return label && label !== "无附加属性" ? label : "";
+}
+
+function equipmentMeta(
+  entry: { id: string; modifier: number; modifier_value: number; fuse_id?: string },
+  options: { value: number; label: string }[],
+): string {
+  const bonus = modifierName(options, entry.modifier);
+  const fuse = entry.fuse_id ? `余料 ${TOTK_ITEM_NAMES[entry.fuse_id] || entry.fuse_id}` : "";
+  return [bonus && `${bonus} ${entry.modifier_value}`, fuse].filter(Boolean).join(" · ") || "无附加效果";
+}
+
 // Durability is a raw hit-count (a fresh weapon reads ~40); overshooting just gives more hits, so
 // a single comfortably-full value covers every item without a per-weapon max table. 999 is the
 // standard stack cap these editors use for quantities.
@@ -38,13 +52,13 @@ const FULL_DURABILITY = 100;
 const MAX_QUANTITY = 999;
 
 const maxQuantityFill = <T extends { quantity: number }>(): QuickFill<T> => ({
-  label: "Max quantity",
+  label: "数量设为最大",
   icon: "999",
   apply: (e) => ({ ...e, quantity: MAX_QUANTITY }),
 });
 
 const weaponDurabilityFill: QuickFill<TotkWeapon> = {
-  label: "Restore durability",
+  label: "恢复耐久度",
   icon: "🛠",
   apply: (e) => ({
     ...e,
@@ -54,13 +68,13 @@ const weaponDurabilityFill: QuickFill<TotkWeapon> = {
 };
 
 const bowDurabilityFill: QuickFill<TotkBow> = {
-  label: "Restore durability",
+  label: "恢复耐久度",
   icon: "🛠",
   apply: (e) => ({ ...e, durability: FULL_DURABILITY }),
 };
 
 const shieldDurabilityFill: QuickFill<TotkShield> = {
-  label: "Restore durability",
+  label: "恢复耐久度",
   icon: "🛠",
   apply: (e) => ({
     ...e,
@@ -98,12 +112,12 @@ function fuseIcon(id: string, size: number) {
 function fuseColumn<T extends { fuse_id: string }>(): ColumnDef<T> {
   return {
     key: "fuse_id" as keyof T,
-    label: "Fuse Id",
+    label: "余料 ID",
     type: "itempicker",
     picker: {
       items: FUSE_ITEMS,
       renderIcon: fuseIcon,
-      nameFor: (id) => (id === "" ? "(none)" : TOTK_ITEM_NAMES[id]),
+      nameFor: (id) => (id === "" ? "（无）" : TOTK_ITEM_NAMES[id]),
     },
   };
 }
@@ -120,7 +134,7 @@ function totkIconImg(url: string, size: number) {
   return <img src={url} width={size} height={size} style={{ objectFit: "contain" }} alt="" onError={onError} />;
 }
 
-// A category-restricted item picker for the "Id" column: shows an icon + name dropdown listing
+// A category-restricted item picker for the "物品 ID" column: shows an icon + name dropdown listing
 // only that category's items, in place of a blind free-text field.
 function idPicker<T extends { id: string }>(category: TotkIconCategory): ColumnDef<T> {
   const urlFor =
@@ -129,7 +143,7 @@ function idPicker<T extends { id: string }>(category: TotkIconCategory): ColumnD
       : (id: string) => totkIconUrl(category, id);
   return {
     key: "id" as keyof T,
-    label: "Id",
+    label: "物品 ID",
     type: "itempicker",
     picker: {
       items: TOTK_CATEGORY_ITEMS[category],
@@ -186,80 +200,80 @@ const BLANK_FOOD: Omit<TotkFood, "id"> = { quantity: 1, hearts_heal: 0, effect: 
 // vary per weapon but 70 is the fallback the source uses, so it makes a sensible soft ceiling.
 const weaponColumns: ColumnDef<TotkWeapon>[] = [
   idPicker<TotkWeapon>("weapon"),
-  num("durability", "Durability", { min: 1, max: 70 }),
-  { key: "modifier", label: "Modifier", type: "select", options: WEAPON_MODIFIER_OPTIONS },
+  num("durability", "耐久度", { min: 1, max: 70 }),
+  { key: "modifier", label: "附加属性", type: "select", options: WEAPON_MODIFIER_OPTIONS },
   {
-    ...num("modifier_value", "Modifier Value", { disabled: (e) => e.modifier === NO_MODIFIER }),
+    ...num("modifier_value", "属性值", { disabled: (e) => e.modifier === NO_MODIFIER }),
     iconFor: (e) => weaponModifierIconUrl(e.modifier),
   },
   fuseColumn<TotkWeapon>(),
-  num("fuse_durability", "Fuse Durability", { min: 0, max: 25 }),
-  num("extra_durability", "Extra Durability", { min: 0, max: 25 }),
-  num("record_extra_durability", "Record Extra Durability", { min: 0, max: 25 }),
+  num("fuse_durability", "余料耐久度", { min: 0, max: 25 }),
+  num("extra_durability", "额外耐久度", { min: 0, max: 25 }),
+  num("record_extra_durability", "记录的额外耐久度", { min: 0, max: 25 }),
 ];
 
 const bowColumns: ColumnDef<TotkBow>[] = [
   idPicker<TotkBow>("bow"),
-  num("durability", "Durability", { min: 1, max: 70 }),
-  { key: "modifier", label: "Modifier", type: "select", options: BOW_MODIFIER_OPTIONS },
+  num("durability", "耐久度", { min: 1, max: 70 }),
+  { key: "modifier", label: "附加属性", type: "select", options: BOW_MODIFIER_OPTIONS },
   {
-    ...num("modifier_value", "Modifier Value", { disabled: (e) => e.modifier === NO_MODIFIER }),
+    ...num("modifier_value", "属性值", { disabled: (e) => e.modifier === NO_MODIFIER }),
     iconFor: (e) => bowModifierIconUrl(e.modifier),
   },
 ];
 
 const shieldColumns: ColumnDef<TotkShield>[] = [
   idPicker<TotkShield>("shield"),
-  num("durability", "Durability", { min: 1, max: 70 }),
-  { key: "modifier", label: "Modifier", type: "select", options: SHIELD_MODIFIER_OPTIONS },
+  num("durability", "耐久度", { min: 1, max: 70 }),
+  { key: "modifier", label: "附加属性", type: "select", options: SHIELD_MODIFIER_OPTIONS },
   {
-    ...num("modifier_value", "Modifier Value", { disabled: (e) => e.modifier === NO_MODIFIER }),
+    ...num("modifier_value", "属性值", { disabled: (e) => e.modifier === NO_MODIFIER }),
     iconFor: (e) => shieldModifierIconUrl(e.modifier),
   },
   fuseColumn<TotkShield>(),
-  num("fuse_durability", "Fuse Durability", { min: 0, max: 25 }),
-  num("extra_durability", "Extra Durability", { min: 0, max: 25 }),
+  num("fuse_durability", "余料耐久度", { min: 0, max: 25 }),
+  num("extra_durability", "额外耐久度", { min: 0, max: 25 }),
 ];
 
 const armorColumns: ColumnDef<TotkArmor>[] = [
   idPicker<TotkArmor>("armor"),
-  { key: "dye_color", label: "Dye Color", type: "select", options: DYE_COLOR_OPTIONS },
+  { key: "dye_color", label: "染色", type: "select", options: DYE_COLOR_OPTIONS },
 ];
 
 const arrowColumns: ColumnDef<TotkArrow>[] = [
   idPicker<TotkArrow>("arrow"),
-  num("quantity", "Quantity", { min: 0, max: MAX_QUANTITY }),
+  num("quantity", "数量", { min: 0, max: MAX_QUANTITY }),
 ];
 
 const materialColumns: ColumnDef<TotkMaterial>[] = [
   idPicker<TotkMaterial>("material"),
-  num("quantity", "Quantity", { min: 0, max: MAX_QUANTITY }),
-  num("get_order", "Get Order"),
-  num("use_order", "Use Order"),
+  num("quantity", "数量", { min: 0, max: MAX_QUANTITY }),
+  num("get_order", "获取顺序"),
+  num("use_order", "使用顺序"),
 ];
 
 const keyItemColumns: ColumnDef<TotkKeyItem>[] = [
   idPicker<TotkKeyItem>("keyItem"),
-  num("quantity", "Quantity", { min: 0, max: MAX_QUANTITY }),
+  num("quantity", "数量", { min: 0, max: MAX_QUANTITY }),
 ];
 
 const deviceColumns: ColumnDef<TotkDevice>[] = [
   idPicker<TotkDevice>("device"),
-  num("quantity", "Quantity", { min: 0, max: MAX_QUANTITY }),
-  num("use_order", "Use Order"),
+  num("quantity", "数量", { min: 0, max: MAX_QUANTITY }),
+  num("use_order", "使用顺序"),
 ];
 
 const foodColumns: ColumnDef<TotkFood>[] = [
   idPicker<TotkFood>("food"),
-  num("quantity", "Quantity", { min: 0, max: MAX_QUANTITY }),
-  num("hearts_heal", "Hearts Heal", { min: -1, max: 160 }),
-  { key: "effect", label: "Food Effect", type: "select", options: FOOD_EFFECT_OPTIONS },
-  { ...num("effect_multiplier", "Multiplier", { min: 0, max: 250 }), iconFor: (e) => foodEffectIconUrl(e.effect) },
-  num("effect_time", "Duration (in seconds)", { min: 0, max: 59999 }),
-  num("price", "Price", { min: 0, max: 999999 }),
+  num("quantity", "数量", { min: 0, max: MAX_QUANTITY }),
+  num("hearts_heal", "恢复心数", { min: -1, max: 160 }),
+  { key: "effect", label: "料理效果", type: "select", options: FOOD_EFFECT_OPTIONS },
+  { ...num("effect_multiplier", "效果倍率", { min: 0, max: 250 }), iconFor: (e) => foodEffectIconUrl(e.effect) },
+  num("effect_time", "持续时间（秒）", { min: 0, max: 59999 }),
+  num("price", "价格", { min: 0, max: 999999 }),
   {
     key: "recipe",
-    label: "Recipe (comma-separated)",
+    label: "食谱（逗号分隔）",
     format: (v) => (v as string[]).join(","),
     parse: (raw) => {
       const parts = raw.split(",").map((s) => s.trim());
@@ -276,7 +290,8 @@ interface ErrorProp {
 export function TotkWeaponsTable({ weapons, onError }: { weapons: TotkWeapon[] } & ErrorProp) {
   return (
     <EditableEntryTable
-      title="Weapons"
+      inventory
+      title="武器"
       entries={weapons}
       columns={weaponColumns}
       setter={api.setPouchWeapons}
@@ -285,6 +300,7 @@ export function TotkWeaponsTable({ weapons, onError }: { weapons: TotkWeapon[] }
       quickFills={[weaponDurabilityFill]}
       iconFor={(e) => totkIconUrl("weapon", e.id)}
       nameFor={nameFor}
+      slotMeta={(e) => equipmentMeta(e, WEAPON_MODIFIER_OPTIONS)}
     />
   );
 }
@@ -292,7 +308,8 @@ export function TotkWeaponsTable({ weapons, onError }: { weapons: TotkWeapon[] }
 export function TotkBowsTable({ bows, onError }: { bows: TotkBow[] } & ErrorProp) {
   return (
     <EditableEntryTable
-      title="Bows"
+      inventory
+      title="弓"
       entries={bows}
       columns={bowColumns}
       setter={api.setPouchBows}
@@ -301,6 +318,7 @@ export function TotkBowsTable({ bows, onError }: { bows: TotkBow[] } & ErrorProp
       quickFills={[bowDurabilityFill]}
       iconFor={(e) => totkIconUrl("bow", e.id)}
       nameFor={nameFor}
+      slotMeta={(e) => equipmentMeta(e, BOW_MODIFIER_OPTIONS)}
     />
   );
 }
@@ -308,7 +326,8 @@ export function TotkBowsTable({ bows, onError }: { bows: TotkBow[] } & ErrorProp
 export function TotkShieldsTable({ shields, onError }: { shields: TotkShield[] } & ErrorProp) {
   return (
     <EditableEntryTable
-      title="Shields"
+      inventory
+      title="盾牌"
       entries={shields}
       columns={shieldColumns}
       setter={api.setPouchShields}
@@ -317,6 +336,7 @@ export function TotkShieldsTable({ shields, onError }: { shields: TotkShield[] }
       quickFills={[shieldDurabilityFill]}
       iconFor={(e) => totkIconUrl("shield", e.id)}
       nameFor={nameFor}
+      slotMeta={(e) => equipmentMeta(e, SHIELD_MODIFIER_OPTIONS)}
     />
   );
 }
@@ -324,7 +344,8 @@ export function TotkShieldsTable({ shields, onError }: { shields: TotkShield[] }
 export function TotkArmorTable({ armor, onError }: { armor: TotkArmor[] } & ErrorProp) {
   return (
     <EditableEntryTable
-      title="Armor"
+      inventory
+      title="防具"
       entries={armor}
       columns={armorColumns}
       setter={api.setArmor}
@@ -332,6 +353,7 @@ export function TotkArmorTable({ armor, onError }: { armor: TotkArmor[] } & Erro
       onAdd={() => addEntry(armor, "armor", BLANK_ARMOR, api.setArmor, onError)}
       iconFor={(e) => totkArmorIconUrl(e.id, e.dye_color)}
       nameFor={nameFor}
+      slotMeta={(e) => `染色 ${DYE_COLOR_OPTIONS.find((color) => color.value === e.dye_color)?.label ?? e.dye_color}`}
     />
   );
 }
@@ -339,7 +361,8 @@ export function TotkArmorTable({ armor, onError }: { armor: TotkArmor[] } & Erro
 export function TotkArrowsTable({ arrows, onError }: { arrows: TotkArrow[] } & ErrorProp) {
   return (
     <EditableEntryTable
-      title="Arrows"
+      inventory
+      title="箭矢"
       entries={arrows}
       columns={arrowColumns}
       setter={api.setArrows}
@@ -355,7 +378,8 @@ export function TotkArrowsTable({ arrows, onError }: { arrows: TotkArrow[] } & E
 export function TotkMaterialsTable({ materials, onError }: { materials: TotkMaterial[] } & ErrorProp) {
   return (
     <EditableEntryTable
-      title="Materials"
+      inventory
+      title="材料"
       entries={materials}
       columns={materialColumns}
       setter={api.setMaterials}
@@ -371,7 +395,8 @@ export function TotkMaterialsTable({ materials, onError }: { materials: TotkMate
 export function TotkKeyItemsTable({ keyItems, onError }: { keyItems: TotkKeyItem[] } & ErrorProp) {
   return (
     <EditableEntryTable
-      title="Key Items"
+      inventory
+      title="重要物品"
       entries={keyItems}
       columns={keyItemColumns}
       setter={api.setKeyItems}
@@ -387,7 +412,8 @@ export function TotkKeyItemsTable({ keyItems, onError }: { keyItems: TotkKeyItem
 export function TotkDevicesTable({ devices, onError }: { devices: TotkDevice[] } & ErrorProp) {
   return (
     <EditableEntryTable
-      title="Devices"
+      inventory
+      title="左纳乌装置"
       entries={devices}
       columns={deviceColumns}
       setter={api.setDevices}
@@ -403,7 +429,8 @@ export function TotkDevicesTable({ devices, onError }: { devices: TotkDevice[] }
 export function TotkFoodTable({ food, onError }: { food: TotkFood[] } & ErrorProp) {
   return (
     <EditableEntryTable
-      title="Food"
+      inventory
+      title="料理"
       entries={food}
       columns={foodColumns}
       setter={api.setFood}
@@ -412,6 +439,7 @@ export function TotkFoodTable({ food, onError }: { food: TotkFood[] } & ErrorPro
       quickFills={[maxQuantityFill<TotkFood>()]}
       iconFor={(e) => totkIconUrl("food", e.id)}
       nameFor={nameFor}
+      slotMeta={(e) => `${e.hearts_heal} 心 · ${FOOD_EFFECT_OPTIONS.find((effect) => effect.value === e.effect)?.label ?? ""}`}
     />
   );
 }

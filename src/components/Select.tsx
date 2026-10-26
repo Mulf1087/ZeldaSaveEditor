@@ -11,7 +11,7 @@ export interface SelectOption {
  * option and risking overwriting it with the wrong value on the next change. */
 export function withCurrentValue(options: SelectOption[], value: number): SelectOption[] {
   if (options.some((o) => o.value === value)) return options;
-  return [{ value, label: `Custom (${value})` }, ...options];
+  return [{ value, label: `自定义 (${value})` }, ...options];
 }
 
 interface Props {

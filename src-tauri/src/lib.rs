@@ -9,6 +9,54 @@ use state::AppState;
 pub fn run() {
     tauri::Builder::default()
         .manage(AppState::default())
+        .setup(|app| {
+            #[cfg(target_os = "macos")]
+            {
+                use tauri::menu::{Menu, PredefinedMenuItem as Item, Submenu};
+
+                let about = Item::about(app, Some("关于塞尔达存档编辑器"), None)?;
+                let separator = || Item::separator(app);
+                let app_menu = Submenu::with_items(app, "塞尔达存档编辑器", true, &[
+                    &about,
+                    &separator()?,
+                    &Item::services(app, Some("服务"))?,
+                    &separator()?,
+                    &Item::hide(app, Some("隐藏塞尔达存档编辑器"))?,
+                    &Item::hide_others(app, Some("隐藏其他应用"))?,
+                    &Item::show_all(app, Some("显示全部"))?,
+                    &separator()?,
+                    &Item::quit(app, Some("退出塞尔达存档编辑器"))?,
+                ])?;
+                let file_menu = Submenu::with_items(app, "文件", true, &[
+                    &Item::close_window(app, Some("关闭窗口"))?,
+                ])?;
+                let edit_menu = Submenu::with_items(app, "编辑", true, &[
+                    &Item::undo(app, Some("撤销"))?,
+                    &Item::redo(app, Some("重做"))?,
+                    &separator()?,
+                    &Item::cut(app, Some("剪切"))?,
+                    &Item::copy(app, Some("复制"))?,
+                    &Item::paste(app, Some("粘贴"))?,
+                    &Item::select_all(app, Some("全选"))?,
+                ])?;
+                let view_menu = Submenu::with_items(app, "显示", true, &[
+                    &Item::fullscreen(app, Some("进入全屏"))?,
+                ])?;
+                let window_menu = Submenu::with_items(app, "窗口", true, &[
+                    &Item::minimize(app, Some("最小化"))?,
+                    &Item::maximize(app, Some("缩放"))?,
+                    &separator()?,
+                    &Item::close_window(app, Some("关闭窗口"))?,
+                ])?;
+                let help_menu = Submenu::with_items(app, "帮助", true, &[
+                    &Item::about(app, Some("关于塞尔达存档编辑器"), None)?,
+                ])?;
+                app.set_menu(Menu::with_items(app, &[
+                    &app_menu, &file_menu, &edit_menu, &view_menu, &window_menu, &help_menu,
+                ])?)?;
+            }
+            Ok(())
+        })
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .invoke_handler(tauri::generate_handler![

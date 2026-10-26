@@ -14,7 +14,7 @@ import styles from "./BotwHorsesTable.module.css";
 
 function withCurrentValue(options: StringOption[], value: string): StringOption[] {
   if (options.some((o) => o.value === value)) return options;
-  return [{ value, label: `Custom (${value})` }, ...options];
+  return [{ value, label: `自定义 (${value})` }, ...options];
 }
 
 function HorseSelect({
@@ -109,15 +109,15 @@ function HorseRow({
 export default function BotwHorsesTable({ horses, onError }: Props) {
   return (
     <div>
-      <SectionHeading title="Horses" motif={<BotwMotif />} />
+      <SectionHeading title="马匹" motif={<BotwMotif />} />
       <table className={styles.table}>
         <thead>
           <tr>
             <th>#</th>
-            <th>Type</th>
-            <th>Name</th>
-            <th>Saddle</th>
-            <th>Reins</th>
+            <th>类型</th>
+            <th>名称</th>
+            <th>马鞍</th>
+            <th>缰绳</th>
           </tr>
         </thead>
         <tbody>

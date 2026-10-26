@@ -47,8 +47,8 @@ export default function BotwView({ state, onError, onRefresh }: Props) {
             icon: <SwordSprite />,
             content: (
               <BotwCategoryTable
-                title="Weapons"
-                valueLabel="Durability"
+                title="武器"
+                valueLabel="耐久度"
                 items={state.items}
                 category="weapon"
                 modifiers={state.weapon_modifiers}
@@ -63,8 +63,8 @@ export default function BotwView({ state, onError, onRefresh }: Props) {
             content: (
               <>
                 <BotwCategoryTable
-                  title="Bows"
-                  valueLabel="Durability"
+                  title="弓"
+                  valueLabel="耐久度"
                   items={state.items}
                   category="bow"
                   subFilter={(item) => !isBotwArrow(item)}
@@ -73,8 +73,8 @@ export default function BotwView({ state, onError, onRefresh }: Props) {
                   onError={onError}
                 />
                 <BotwCategoryTable
-                  title="Arrows"
-                  valueLabel="Quantity"
+                  title="箭矢"
+                  valueLabel="数量"
                   items={state.items}
                   category="bow"
                   subFilter={isBotwArrow}
@@ -90,8 +90,8 @@ export default function BotwView({ state, onError, onRefresh }: Props) {
             icon: <ShieldSprite />,
             content: (
               <BotwCategoryTable
-                title="Shields"
-                valueLabel="Durability"
+                title="盾牌"
+                valueLabel="耐久度"
                 items={state.items}
                 category="shield"
                 modifiers={state.shield_modifiers}
@@ -105,8 +105,8 @@ export default function BotwView({ state, onError, onRefresh }: Props) {
             icon: <ShirtSprite />,
             content: (
               <BotwCategoryTable
-                title="Armor"
-                valueLabel="Dye Color"
+                title="防具"
+                valueLabel="染色"
                 items={state.items}
                 category="armor"
                 onError={onError}
@@ -119,8 +119,8 @@ export default function BotwView({ state, onError, onRefresh }: Props) {
             icon: <LeafIcon />,
             content: (
               <BotwCategoryTable
-                title="Materials"
-                valueLabel="Quantity"
+                title="材料"
+                valueLabel="数量"
                 items={state.items}
                 category="material"
                 onError={onError}
@@ -132,7 +132,7 @@ export default function BotwView({ state, onError, onRefresh }: Props) {
             label: "料理",
             icon: <AppleSprite />,
             content: (
-              <BotwCategoryTable title="Food" valueLabel="Quantity" items={state.items} category="food" onError={onError} />
+              <BotwCategoryTable title="料理" valueLabel="数量" items={state.items} category="food" onError={onError} />
             ),
           },
           {
@@ -141,8 +141,8 @@ export default function BotwView({ state, onError, onRefresh }: Props) {
             icon: <ChestIcon />,
             content: (
               <BotwCategoryTable
-                title="Key Items"
-                valueLabel="Quantity"
+                title="重要物品"
+                valueLabel="数量"
                 items={state.items}
                 category="key_item"
                 onError={onError}

@@ -11,6 +11,8 @@ import { withCurrentValue } from "../Select";
 import ItemPicker from "../ItemPicker";
 import HoverPreview from "../HoverPreview";
 import { rowHeaderToggle, guardBounds } from "../totk/EditableEntryTable";
+import InventoryGrid from "../InventoryGrid";
+import gridStyles from "../InventoryGrid.module.css";
 import styles from "./BotwItemsTable.module.css";
 
 const ICON_SIZE = 48;
@@ -70,7 +72,7 @@ function ModifierCell({
     api.setModifier(category, categoryIndex, modifier.modifier, Number(value)).catch((err) => onError(String(err)));
   return (
     <>
-      <td data-label="Modifier">
+      <td data-label="附加属性">
         <select
           className={styles.input}
           value={String(modifier.modifier)}
@@ -83,7 +85,7 @@ function ModifierCell({
           ))}
         </select>
       </td>
-      <td data-label="Modifier Value">
+      <td data-label="属性值">
         <input
           className={styles.input}
           type="number"
@@ -106,6 +108,7 @@ function ItemRow({
   categoryIndex,
   pickerItems,
   allowMaxQuantity,
+  detailMode = false,
   onError,
 }: {
   index: number;
@@ -116,11 +119,12 @@ function ItemRow({
   categoryIndex: number;
   pickerItems: string[];
   allowMaxQuantity: boolean;
+  detailMode?: boolean;
   onError: (message: string) => void;
 }) {
   const [name, setName] = useState(item.name);
   const [quantity, setQuantity] = useState(String(item.quantity));
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(detailMode);
   const toggle = () => setExpanded((v) => !v);
   const commit = () => {
     const guarded = guardBounds(Number(quantity), item.quantity, 0, itemMaxQuantity(item));
@@ -133,7 +137,7 @@ function ItemRow({
     setQuantity("999");
     api.setItem(index, name, 999).catch((err) => onError(String(err)));
   };
-  const isDye = valueLabel === "Dye Color";
+  const isDye = valueLabel === "染色";
 
   return (
     <tr data-collapsed={expanded ? "false" : "true"} onClick={(e) => rowHeaderToggle(e, toggle)}>
@@ -142,7 +146,7 @@ function ItemRow({
           type="button"
           className={styles.rowToggle}
           aria-expanded={expanded}
-          aria-label={expanded ? "Collapse" : "Expand"}
+          aria-label={expanded ? "收起" : "展开"}
           onClick={(e) => {
             e.stopPropagation();
             toggle();
@@ -158,7 +162,7 @@ function ItemRow({
       <td data-summary data-grow>
         {BOTW_ITEM_NAMES[item.name] ?? ""}
       </td>
-      <td data-label="Id">
+      <td data-label="物品 ID">
         <ItemPicker
           value={name}
           items={pickerItems}
@@ -201,17 +205,17 @@ function ItemRow({
           <ModifierCell category={modifierCategory} categoryIndex={categoryIndex} modifier={modifier} onError={onError} />
         ) : (
           <>
-            <td data-label="Modifier" />
-            <td data-label="Modifier Value" />
+            <td data-label="附加属性" />
+            <td data-label="属性值" />
           </>
         ))}
-      <td data-label="Actions">
+      <td data-label="操作">
         <div className={styles.rowActions}>
           {allowMaxQuantity && (
             <button
               type="button"
               className={styles.rowAction}
-              title="Max quantity"
+              title="数量设为最大"
               onClick={(e) => {
                 e.stopPropagation();
                 maxQuantity();
@@ -223,7 +227,7 @@ function ItemRow({
           <button
             type="button"
             className={styles.rowAction}
-            title="Duplicate"
+            title="复制"
             onClick={(e) => {
               e.stopPropagation();
               duplicate();
@@ -234,7 +238,7 @@ function ItemRow({
           <button
             type="button"
             className={styles.rowAction}
-            title="Delete"
+            title="删除"
             onClick={(e) => {
               e.stopPropagation();
               remove();
@@ -280,6 +284,23 @@ export function BotwCategoryTable({
   const modifierCategory: ModifierCategory | null =
     modifiers && (category === "weapon" || category === "bow" || category === "shield") ? category : null;
   const pickerOptions = pickerItems ?? BOTW_CATEGORY_ITEMS[category];
+  const slots = entries.map(({ item, index }, categoryIndex) => {
+    const modifier = modifiers?.[categoryIndex];
+    const modifierName = modifier && modifier.modifier !== 0
+      ? MODIFIER_OPTIONS.find((option) => option.value === modifier.modifier)?.label ?? "特殊属性"
+      : null;
+    const value = valueLabel === "染色"
+      ? `染色 ${DYE_COLOR_OPTIONS.find((option) => option.value === item.quantity)?.label ?? item.quantity}`
+      : valueLabel === "耐久度" ? `耐久 ${item.quantity}` : `数量 ${item.quantity}`;
+    return {
+      key: index,
+      icon: botwSpriteIcon(item.name, 68, category === "armor" ? item.quantity : undefined),
+      name: BOTW_ITEM_NAMES[item.name] || item.name,
+      badge: valueLabel === "数量" ? `×${item.quantity}` : undefined,
+      quantityBadge: valueLabel === "数量",
+      meta: modifierName ? `${value} · ${modifierName} ${modifier!.value}` : value,
+    };
+  });
 
   // A new item is appended into the first empty slot at the end of the flat array (index equal to
   // the current item count), mirroring marcrobledo's addItem. The default id is the first entry of
@@ -293,49 +314,57 @@ export function BotwCategoryTable({
   return (
     <div>
       <SectionHeading title={`${title} (${entries.length})`} motif={<BotwMotif />} />
-      <div className={styles.tableWrap}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th></th>
-              <th>Name</th>
-              <th>Id</th>
-              <th>{valueLabel}</th>
-              {modifierCategory && (
-                <>
-                  <th>Modifier</th>
-                  <th>Modifier Value</th>
-                </>
-              )}
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {entries.map(({ item, index }, categoryIndex) => (
-              <ItemRow
-                key={index}
-                index={index}
-                item={item}
-                valueLabel={valueLabel}
-                modifierCategory={modifierCategory}
-                modifier={modifiers?.[categoryIndex]}
-                categoryIndex={categoryIndex}
-                pickerItems={pickerOptions}
-                allowMaxQuantity={valueLabel === "Quantity"}
-                onError={onError}
-              />
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <InventoryGrid
+        title={title}
+        slots={slots}
+        renderDetail={(selected) => {
+          const { item, index } = entries[selected];
+          return (
+            <div className={styles.tableWrap}>
+              <table className={`${styles.table} ${gridStyles.detailTable}`}>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th></th>
+                    <th>名称</th>
+                    <th>物品 ID</th>
+                    <th>{valueLabel}</th>
+                    {modifierCategory && (
+                      <>
+                        <th>附加属性</th>
+                        <th>属性值</th>
+                      </>
+                    )}
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ItemRow
+                    key={index}
+                    index={index}
+                    item={item}
+                    valueLabel={valueLabel}
+                    modifierCategory={modifierCategory}
+                    modifier={modifiers?.[selected]}
+                    categoryIndex={selected}
+                    pickerItems={pickerOptions}
+                    allowMaxQuantity={valueLabel === "数量"}
+                    detailMode
+                    onError={onError}
+                  />
+                </tbody>
+              </table>
+            </div>
+          );
+        }}
+      />
       <button
         type="button"
         className={styles.addButton}
         onClick={addItem}
         disabled={items.length >= MAX_ITEMS}
       >
-        + Add {title}
+        ＋添加{title}
       </button>
     </div>
   );

@@ -3,6 +3,8 @@ import SectionHeading from "../../theme/SectionHeading";
 import { withCurrentValue, type SelectOption } from "../Select";
 import ItemIcon from "./ItemIcon";
 import ItemPicker from "../ItemPicker";
+import InventoryGrid from "../InventoryGrid";
+import gridStyles from "../InventoryGrid.module.css";
 import styles from "./EditableEntryTable.module.css";
 
 export type { SelectOption };
@@ -22,7 +24,7 @@ export interface PickerDef {
   nameFor: (id: string) => string | undefined;
 }
 
-/** A one-click field preset shown in a row's actions cell (e.g. "Restore durability"). `apply`
+/** A one-click field preset shown in a row's actions cell (e.g. "恢复耐久度"). `apply`
  * returns the whole row with the preset fields changed. */
 export interface QuickFill<T> {
   label: string;
@@ -211,12 +213,13 @@ interface RowProps<T> {
   /** When true, renders per-row delete/duplicate controls. */
   rowActions?: boolean;
   quickFills?: QuickFill<T>[];
+  detailMode?: boolean;
 }
 
-function EntryRow<T>({ entries, index, columns, setter, onError, iconFor, nameFor, rowActions, quickFills }: RowProps<T>) {
+function EntryRow<T>({ entries, index, columns, setter, onError, iconFor, nameFor, rowActions, quickFills, detailMode = false }: RowProps<T>) {
   // Rows start collapsed; the flag only takes effect at narrow widths (see `.table` media query),
   // where a chevron in the header expands the detail fields. At wide widths it's ignored.
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(detailMode);
   const toggle = () => setExpanded((v) => !v);
   const entry = entries[index];
   const remove = () => setter(entries.filter((_, i) => i !== index)).catch((err) => onError(String(err)));
@@ -233,7 +236,7 @@ function EntryRow<T>({ entries, index, columns, setter, onError, iconFor, nameFo
           type="button"
           className={styles.rowToggle}
           aria-expanded={expanded}
-          aria-label={expanded ? "Collapse" : "Expand"}
+          aria-label={expanded ? "收起" : "展开"}
           onClick={(e) => {
             e.stopPropagation();
             toggle();
@@ -257,7 +260,7 @@ function EntryRow<T>({ entries, index, columns, setter, onError, iconFor, nameFo
         <Cell key={String(c.key)} entries={entries} index={index} column={c} setter={setter} onError={onError} />
       ))}
       {rowActions && (
-        <td data-label="Actions">
+        <td data-label="操作">
           <div className={styles.rowActions}>
             {quickFills?.map((q) => (
               <button
@@ -276,7 +279,7 @@ function EntryRow<T>({ entries, index, columns, setter, onError, iconFor, nameFo
             <button
               type="button"
               className={styles.rowAction}
-              title="Duplicate"
+              title="复制"
               onClick={(e) => {
                 e.stopPropagation();
                 duplicate();
@@ -287,7 +290,7 @@ function EntryRow<T>({ entries, index, columns, setter, onError, iconFor, nameFo
             <button
               type="button"
               className={styles.rowAction}
-              title="Delete"
+              title="删除"
               onClick={(e) => {
                 e.stopPropagation();
                 remove();
@@ -316,6 +319,9 @@ interface Props<T> {
   onAdd?: () => void;
   /** One-click field presets shown per row (only rendered alongside the delete/duplicate actions). */
   quickFills?: QuickFill<T>[];
+  /** Render item entries as a paged game-style inventory. Other data tables keep their normal rows. */
+  inventory?: boolean;
+  slotMeta?: (entry: T) => string;
 }
 
 export default function EditableEntryTable<T>({
@@ -330,7 +336,52 @@ export default function EditableEntryTable<T>({
   nameFor,
   onAdd,
   quickFills,
+  inventory = false,
+  slotMeta,
 }: Props<T>) {
+  const renderTable = (selected?: number) => (
+    <div className={styles.tableWrap}>
+      <table className={selected === undefined ? styles.table : `${styles.table} ${gridStyles.detailTable}`}>
+        <thead>
+          <tr>
+            <th>#</th>
+            {iconFor && <th></th>}
+            {nameFor && <th>名称</th>}
+            {columns.map((c) => <th key={String(c.key)}>{c.label}</th>)}
+            {onAdd && <th></th>}
+          </tr>
+        </thead>
+        <tbody>
+          {(selected === undefined ? entries.map((_, i) => i) : [selected]).map((i) => (
+            <EntryRow
+              key={i}
+              entries={entries}
+              index={i}
+              columns={columns}
+              setter={setter}
+              onError={onError}
+              iconFor={iconFor}
+              nameFor={nameFor}
+              rowActions={Boolean(onAdd)}
+              quickFills={quickFills}
+              detailMode={selected !== undefined}
+            />
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+  const badgeColumn = columns.find((column) => column.key === "quantity" || column.key === "durability");
+  const slots = inventory && iconFor && nameFor ? entries.map((entry, index) => ({
+    key: index,
+    icon: <ItemIcon url={iconFor(entry)} size={68} preview={false} />,
+    name: nameFor(entry) || String((entry as { id?: string }).id ?? `#${index + 1}`),
+    badge: badgeColumn
+      ? `${badgeColumn.key === "quantity" ? "×" : "耐久 "}${String(entry[badgeColumn.key])}`
+      : undefined,
+    quantityBadge: badgeColumn?.key === "quantity",
+    meta: slotMeta?.(entry) || undefined,
+  })) : [];
   return (
     <div>
       <SectionHeading level={level} motif={motif} title={`${title} (${entries.length})`} />
@@ -345,40 +396,12 @@ export default function EditableEntryTable<T>({
           </datalist>
         ),
       )}
-      <div className={styles.tableWrap}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>#</th>
-              {iconFor && <th></th>}
-              {nameFor && <th>Name</th>}
-              {columns.map((c) => (
-                <th key={String(c.key)}>{c.label}</th>
-              ))}
-              {onAdd && <th></th>}
-            </tr>
-          </thead>
-          <tbody>
-            {entries.map((_, i) => (
-              <EntryRow
-                key={i}
-                entries={entries}
-                index={i}
-                columns={columns}
-                setter={setter}
-                onError={onError}
-                iconFor={iconFor}
-                nameFor={nameFor}
-                rowActions={Boolean(onAdd)}
-                quickFills={quickFills}
-              />
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {inventory && iconFor && nameFor
+        ? <InventoryGrid title={title} slots={slots} renderDetail={(selected) => renderTable(selected)} />
+        : renderTable()}
       {onAdd && (
         <button type="button" className={styles.addButton} onClick={onAdd}>
-          + Add {title}
+          ＋添加{title}
         </button>
       )}
     </div>

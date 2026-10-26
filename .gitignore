@@ -18,5 +18,9 @@ yarn-error.log*
 
 /secrets
 
+# 本机游戏存档及相册；测试用匿名 fixture 保存在 crates/ 下。
+/旷野之息存档/
+/王国之泪存档/
+
 .DS_Store
 Thumbs.db

@@ -14,7 +14,7 @@ function textToHash(raw: string): number {
 const columns: ColumnDef<TotkMapMarker>[] = [
   {
     key: "color",
-    label: "Color",
+    label: "颜色",
     format: (v) => hashToText(v as number),
     parse: (raw) => textToHash(raw) as TotkMapMarker["color"],
   },
@@ -31,7 +31,7 @@ interface Props {
 export default function TotkMapMarkersTable({ mapMarkers, onError }: Props) {
   return (
     <EditableEntryTable
-      title="Map Markers"
+      title="地图标记"
       entries={mapMarkers}
       columns={columns}
       setter={api.setMapMarkers}

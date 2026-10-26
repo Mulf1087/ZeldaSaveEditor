@@ -84,7 +84,7 @@ fn load_from_path(app: &AppHandle, state: &AppState, path: FilePath) -> Result<O
 }
 
 #[tauri::command]
-pub fn open_save(app: tauri::AppHandle, state: State<'_, AppState>) -> Result<OpenResult, ShellError> {
+pub async fn open_save(app: tauri::AppHandle, state: State<'_, AppState>) -> Result<OpenResult, ShellError> {
     let picked = app
         .dialog()
         .file()
@@ -115,17 +115,17 @@ pub fn current_path(state: State<'_, AppState>) -> Option<String> {
 /// the save picker mirrors what a user has to do manually today and keeps Save working instead of
 /// surfacing a raw "Permission Denial ... requires MANAGE_DOCUMENTS" error from the OS.
 #[tauri::command]
-pub fn save(app: tauri::AppHandle, state: State<'_, AppState>) -> Result<(), ShellError> {
+pub async fn save(app: tauri::AppHandle, state: State<'_, AppState>) -> Result<(), ShellError> {
     let path = crate::state::lock(&state.path).clone().ok_or_else(ShellError::no_save_loaded)?;
     let result = write_current_save(&app, state.inner(), &path);
     if result.is_err() && matches!(path, FilePath::Url(_)) {
-        return save_as(app, state);
+        return save_as(app, state).await;
     }
     result
 }
 
 #[tauri::command]
-pub fn save_as(app: tauri::AppHandle, state: State<'_, AppState>) -> Result<(), ShellError> {
+pub async fn save_as(app: tauri::AppHandle, state: State<'_, AppState>) -> Result<(), ShellError> {
     let picked = app
         .dialog()
         .file()

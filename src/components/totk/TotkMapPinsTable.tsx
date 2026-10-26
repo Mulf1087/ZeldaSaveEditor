@@ -15,7 +15,7 @@ function textToHash(raw: string): number {
 const columns: ColumnDef<TotkMapPin>[] = [
   {
     key: "icon",
-    label: "Icon",
+    label: "图标",
     format: (v) => hashToText(v as number),
     parse: (raw) => textToHash(raw) as TotkMapPin["icon"],
   },
@@ -23,7 +23,7 @@ const columns: ColumnDef<TotkMapPin>[] = [
   { key: "y", label: "Y", type: "number", parse: (raw) => Number(raw) as TotkMapPin["y"] },
   {
     key: "layer",
-    label: "Layer",
+    label: "地图层",
     format: (v) => hashToText(v as number),
     parse: (raw) => textToHash(raw) as TotkMapPin["layer"],
   },
@@ -37,7 +37,7 @@ interface Props {
 export default function TotkMapPinsTable({ mapPins, onError }: Props) {
   return (
     <EditableEntryTable
-      title="Map Pins"
+      title="地图图钉"
       entries={mapPins}
       columns={columns}
       setter={api.setMapPins}
